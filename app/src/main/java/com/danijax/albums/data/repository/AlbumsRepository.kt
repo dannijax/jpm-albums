@@ -10,10 +10,7 @@ import com.danijax.albums.data.model.Album
 import com.danijax.albums.data.model.Mapper
 import com.danijax.albums.ui.albums.ViewAlbums
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 class AlbumsRepository(private val remote: DataSource<List<Album>>, private val local: DataSource<List<com.danijax.albums.data.db.Album>>) {
@@ -23,10 +20,15 @@ class AlbumsRepository(private val remote: DataSource<List<Album>>, private val 
 
         return object : NetworkBoundResource<List<Album>, List<com.danijax.albums.data.db.Album>>(){
             override fun loadFromDb(): Flow<List<Album>> {
+                Log.e(TAG, "Checking DB")
+                Log.e(TAG, "$")
                 return local.get()
                     .map { albums ->
+
                         Mapper.toDTOListFromEntity(albums)
-                    }
+
+                    }.flowOn(Dispatchers.IO)
+
             }
 
             override fun shouldFetch(data: List<com.danijax.albums.data.db.Album>): Boolean {
@@ -44,11 +46,14 @@ class AlbumsRepository(private val remote: DataSource<List<Album>>, private val 
                 return Mapper.toEntityList(data)
             }
 
-            override suspend fun saveNetworkResult(item: List<com.danijax.albums.data.db.Album>) {
+            override suspend fun saveNetworkResult(item: List<com.danijax.albums.data.db.Album>)
+            {
+                Log.e(TAG, "Saving to DB ...")
                 local.save(item)
             }
 
             override fun fetchFromNetwork(): Flow<List<com.danijax.albums.data.db.Album>> {
+                Log.e(TAG, "fetching  from remote ...")
                 return remote
                     .get()
                     .map { items ->

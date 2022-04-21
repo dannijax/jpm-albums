@@ -19,8 +19,6 @@ abstract class AlbumsDatabase: RoomDatabase() {
             if (INSTANCE == null) {
                 synchronized(AlbumsDatabase::class) {
                     INSTANCE = Room.databaseBuilder(context, AlbumsDatabase::class.java, "albums.db")
-                        //.addMigrations(MIGRATION_1_2)
-                        //.addMigrations(MIGRATION_2_3)
                         .allowMainThreadQueries()
                         .fallbackToDestructiveMigration()
                         .build()
