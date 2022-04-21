@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(entities = [Album::class], version = 1, exportSchema = true)
+@TypeConverters(DateConverter::class)
 abstract class AlbumsDatabase: RoomDatabase() {
 
     abstract fun albumDao(): AlbumDao
@@ -20,6 +22,7 @@ abstract class AlbumsDatabase: RoomDatabase() {
                         //.addMigrations(MIGRATION_1_2)
                         //.addMigrations(MIGRATION_2_3)
                         .allowMainThreadQueries()
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
             }
