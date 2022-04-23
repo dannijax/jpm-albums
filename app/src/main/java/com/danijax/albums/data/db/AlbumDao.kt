@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlbumDao {
+    @Transaction
     @Query("SELECT * FROM albums ORDER BY id DESC")
     fun getAlbums(): Flow<List<Album>>
 

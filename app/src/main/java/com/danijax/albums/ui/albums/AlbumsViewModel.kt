@@ -6,9 +6,11 @@ import androidx.lifecycle.asLiveData
 import com.danijax.albums.data.datasource.Resource
 import com.danijax.albums.data.model.Mapper
 import com.danijax.albums.data.repository.AlbumsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
-
-class AlbumsViewModel(private val repository: AlbumsRepository): ViewModel() {
+import javax.inject.Inject
+@HiltViewModel
+class AlbumsViewModel @Inject constructor(private val repository: AlbumsRepository): ViewModel() {
 
     val liveData : LiveData<AlbumResults> = repository.getAlbums()
         .map {res ->
@@ -17,13 +19,11 @@ class AlbumsViewModel(private val repository: AlbumsRepository): ViewModel() {
                  result =  when(res){
                     Resource.Success(albums) ->  AlbumResults(Mapper.toList(albums), false, "Success")
                     Resource.Loading(albums) ->  AlbumResults(Mapper.toList(albums), true, "Loading from remote")
-                    Resource.Error("", null) ->  AlbumResults(Mapper.toList(res.data), false, res?.message!!)
-                    else -> {AlbumResults(emptyList(), false, res.message!!)}
+                    Resource.Error("", null) ->  AlbumResults(Mapper.toList(res.data), false, res.message)
+                    else -> {AlbumResults(emptyList(), false, res.message)}
                 }
             }
-
             result
-
         }
         .asLiveData()
 }

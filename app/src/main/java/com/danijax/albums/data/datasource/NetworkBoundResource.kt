@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.util.*
-
+//Provides strategy to handle offline first
 abstract class NetworkBoundResource<ResultType, RequestType>{
 
     private val TAG = "NetworkBoundResource"
@@ -30,8 +30,6 @@ abstract class NetworkBoundResource<ResultType, RequestType>{
         }
 
     }
-
-
 
     @WorkerThread
     abstract fun loadFromDb(): Flow<ResultType>

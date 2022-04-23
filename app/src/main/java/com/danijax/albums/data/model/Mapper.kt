@@ -44,21 +44,6 @@ object Mapper {
     }
 
     private fun toDTO(album: com.danijax.albums.data.db.Album): Album {
-        val color = when((1..12).random()){
-            1 -> Color.BLACK
-            2 -> Color.BLUE
-            3 -> Color.CYAN
-            4 -> Color.GRAY
-            5 -> Color.GREEN
-            6 -> Color.DKGRAY
-            7 -> Color.RED
-            8 -> Color.TRANSPARENT
-            9 -> Color.LTGRAY
-            10 -> Color.MAGENTA
-            11-> Color.YELLOW
-            12 -> Color.WHITE
-            else -> Color.WHITE
-        }
         return Album(album.userId.toInt(), album.id, album.title);
     }
 

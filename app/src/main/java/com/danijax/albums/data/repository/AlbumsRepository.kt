@@ -3,17 +3,16 @@ package com.danijax.albums.data.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import com.danijax.albums.data.datasource.DataSource
-import com.danijax.albums.data.datasource.NetworkBoundResource
-import com.danijax.albums.data.datasource.Resource
+import com.danijax.albums.data.datasource.*
 import com.danijax.albums.data.model.Album
 import com.danijax.albums.data.model.Mapper
 import com.danijax.albums.ui.albums.ViewAlbums
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.util.*
+import javax.inject.Inject
 
-class AlbumsRepository(private val remote: DataSource<List<Album>>, private val local: DataSource<List<com.danijax.albums.data.db.Album>>) {
+class AlbumsRepository @Inject constructor(private val remote: RemoteSource, private val local: LocalSource) {
     private val TAG = "Repository"
     private val TIME_TO_LIVE = 1000L
     fun getAlbums(): Flow<Resource<out List<Album>?>> {

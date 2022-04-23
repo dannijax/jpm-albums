@@ -43,7 +43,7 @@ object HttpProvider {
             .baseUrl("https://jsonplaceholder.typicode.com")
             .addConverterFactory(GsonConverterFactory.create(Gson()))
             .addCallAdapterFactory(FlowCallAdapterFactory.create())
-            .client(HttpProvider.getOkHttpClient())
+            .client(getOkHttpClient())
             .build()
             .create(AlbumsApiService::class.java)
     }

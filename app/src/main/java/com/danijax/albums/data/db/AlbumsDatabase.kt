@@ -20,7 +20,10 @@ abstract class AlbumsDatabase: RoomDatabase() {
                 synchronized(AlbumsDatabase::class) {
                     INSTANCE = Room.databaseBuilder(context, AlbumsDatabase::class.java, "albums.db")
                         .allowMainThreadQueries()
-                        .fallbackToDestructiveMigration()
+                        .fallbackToDestructiveMigration()//for no this is what we need when a user
+                        //uninstalls application. Migrations can be provided if needed via the
+                        // Migration Object
+
                         .build()
                 }
             }
