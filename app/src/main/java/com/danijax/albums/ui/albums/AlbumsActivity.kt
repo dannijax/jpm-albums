@@ -27,11 +27,26 @@ class AlbumsActivity : AppCompatActivity() {
         binding = ActivityAlbumsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         albumsAdapter = AlbumsAdapter(mutableListOf())
-        viewModel.liveData.observe(this, Observer {
-            Log.e("Live data", it.message)
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-            binding.loadingSpinner.hide(it.loading)
-            albumsAdapter.update(it.data)
+        viewModel.liveData.observe(this, Observer {result ->
+            Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+            binding.loadingSpinner.hide(result.loading)
+           var items: List<ViewAlbums> =  when(result.sorting){
+                Sorting.ByTitle("")-> result.data.sortedBy {
+                    it.title
+                }
+
+               Sorting.ById("")-> result.data.sortedBy {
+                   it.id
+               }
+
+               Sorting.ByUserId("")-> result.data.sortedBy {
+                   it.userId
+               }
+               else -> {
+                   emptyList<ViewAlbums>()}
+           }
+            albumsAdapter.update(items)
+
         })
 
         //Recylcerview setup
