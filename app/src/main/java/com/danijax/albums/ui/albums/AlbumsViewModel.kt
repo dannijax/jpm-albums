@@ -12,13 +12,13 @@ class AlbumsViewModel(private val repository: AlbumsRepository): ViewModel() {
 
     val liveData : LiveData<AlbumResults> = repository.getAlbums()
         .map {res ->
-            var result = AlbumResults(emptyList(), false, res.message!!)
+            var result = AlbumResults(emptyList(), false, res.message!!, Sorting.ByTitle("Title"))
             res.data?.let { albums ->
                  result =  when(res){
-                    Resource.Success(albums) ->  AlbumResults(Mapper.toList(albums), false, "Success")
-                    Resource.Loading(albums) ->  AlbumResults(Mapper.toList(albums), true, "Loading from remote")
-                    Resource.Error("", null) ->  AlbumResults(Mapper.toList(res.data), false, res?.message!!)
-                    else -> {AlbumResults(emptyList(), false, res.message!!)}
+                    Resource.Success(albums) ->  AlbumResults(Mapper.toList(albums), false, "Success", Sorting.ByTitle("Title"))
+                    Resource.Loading(albums) ->  AlbumResults(Mapper.toList(albums), true, "Loading from remote", Sorting.ByTitle("Title"))
+                    Resource.Error("", null) ->  AlbumResults(Mapper.toList(res.data), false, res.message, Sorting.ByTitle("Title"))
+                    else -> {AlbumResults(emptyList(), false, res.message, Sorting.ByTitle("Title"))}
                 }
             }
 

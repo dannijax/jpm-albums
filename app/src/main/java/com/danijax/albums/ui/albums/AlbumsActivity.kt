@@ -29,11 +29,13 @@ class AlbumsActivity : AppCompatActivity() {
         val repo = AlbumsRepository(dataSource, local)
 
         val viewModel = AlbumsViewModel(repo)
-        viewModel.liveData.observe(this, Observer {
-            Log.e("Live data", it.message)
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-            binding.loadingSpinner.hide(it.loading)
-            albumsAdapter.update(it.data)
+        viewModel.liveData.observe(this, Observer {result ->
+            Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+            binding.loadingSpinner.hide(result.loading)
+            when(result.sorting){
+
+            }
+            albumsAdapter.update(result.data)
         })
 
         //Recylcerview setup
