@@ -26,17 +26,14 @@ class AlbumsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAlbumsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //viewModel.fetchAlbums()
         albumsAdapter = AlbumsAdapter(mutableListOf())
         viewModel.albumResultLiveData.observe(this, Observer { result ->
             Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
             binding.loadingSpinner.hide(result.loading)
             albumsAdapter.update(result.data)
-            //viewModel.sorting(result)
         })
 
         viewModel.sortingLiveData.observe(this, Observer {items ->
-            Log.e("VVM", "doing something")
             albumsAdapter.update(items.data)
         })
 
