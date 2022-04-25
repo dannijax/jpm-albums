@@ -1,27 +1,29 @@
 package com.danijax.albums.data.repository
 
+import android.media.MediaMetadata
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import com.danijax.albums.data.datasource.DataSource
-import com.danijax.albums.data.datasource.NetworkBoundResource
-import com.danijax.albums.data.datasource.Resource
+import com.danijax.albums.data.datasource.*
 import com.danijax.albums.data.model.Album
 import com.danijax.albums.data.model.Mapper
 import com.danijax.albums.ui.albums.ViewAlbums
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 
-class AlbumsRepository(private val remote: DataSource<List<Album>>, private val local: DataSource<List<com.danijax.albums.data.db.Album>>) {
+class AlbumsRepository @Inject constructor(private val remote: RemoteSource, private val local: LocalSource) {
     private val TAG = "Repository"
     private val TIME_TO_LIVE = 1000L
-    fun getAlbums(): Flow<Resource<out List<Album>?>> {
+    private val IN_MEM_CACHE = mutableListOf<Album>()
 
+
+    fun getAlbums(): Flow<Resource<out List<Album>?>> {
         return object : NetworkBoundResource<List<Album>, List<com.danijax.albums.data.db.Album>>(){
             override fun loadFromDb(): Flow<List<Album>> {
-                Log.e(TAG, "Checking DB")
-                Log.e(TAG, "$")
+                Timber.tag(TAG).i("Checking DB")
                 return local.get()
                     .map { albums ->
 
@@ -46,30 +48,44 @@ class AlbumsRepository(private val remote: DataSource<List<Album>>, private val 
                 return Mapper.toEntityList(data)
             }
 
-            override suspend fun saveNetworkResult(item: List<com.danijax.albums.data.db.Album>)
-            {
-                Log.e(TAG, "Saving to DB ...")
+            override suspend fun saveNetworkResult(item: List<com.danijax.albums.data.db.Album>) {
+                Timber.i("Saving to DB ...")
                 local.save(item)
             }
 
             override fun fetchFromNetwork(): Flow<List<com.danijax.albums.data.db.Album>> {
-                Log.e(TAG, "fetching  from remote ...")
+                Timber.i("fetching  from remote ...")
                 return remote
                     .get()
                     .map { items ->
-                       convert(items)
+                        convert(items)
                     }
                     .flowOn(Dispatchers.IO)
             }
 
+            override fun isCacheResult(): Boolean {
+                return IN_MEM_CACHE.isNotEmpty()
+            }
 
+            override fun loadFromCache(): Flow<List<Album>> {
+                Timber.i("fetching  from Cache ...")
+                return flow<List<Album>> {
+                    IN_MEM_CACHE
+                }.flowOn(Dispatchers.IO)
+            }
+
+            override fun saveToCache(resultType: List<Album>) {
+                Timber.i("Saving to Cache ...")
+                IN_MEM_CACHE.clear()
+                IN_MEM_CACHE.addAll(resultType)
+            }
         }.asFlow()
-
-
-
-//        return remote.get().map {
-//            Mapper.toList(it)
-//        }.flowOn(Dispatchers.IO)
-//            .onCompletion {  }
     }
+
+    fun getOriginalList() = flow<List<Album>> {
+        val data = IN_MEM_CACHE
+        Log.i(TAG, "getOriginalList: $data")
+        emit(data)
+
+    }.flowOn(Dispatchers.Main)
 }
