@@ -64,6 +64,7 @@ class AlbumsRepository @Inject constructor(private val remote: RemoteSource, pri
             }
 
             override fun isCacheResult(): Boolean {
+                Timber.i("$IN_MEM_CACHE.isNotEmpty()")
                 return IN_MEM_CACHE.isNotEmpty()
             }
 
@@ -84,7 +85,7 @@ class AlbumsRepository @Inject constructor(private val remote: RemoteSource, pri
 
     fun getOriginalList() = flow<List<Album>> {
         val data = IN_MEM_CACHE
-        Log.i(TAG, "getOriginalList: $data")
+        Timber.i("getOriginalList: " + data)
         emit(data)
 
     }.flowOn(Dispatchers.Main)

@@ -26,6 +26,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>{
                 try {
                     val flowResult = fetchFromNetwork().first()
                     saveNetworkResult(flowResult)
+                    saveToCache(loadFromDb().first())
                     emitAll(loadFromDb().map { Resource.Success(it) })
                 }
                 catch (ex: Exception){

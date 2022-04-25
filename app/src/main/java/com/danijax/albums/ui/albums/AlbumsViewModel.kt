@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(private val repository: AlbumsRepository): ViewModel() {
@@ -33,11 +34,16 @@ class AlbumsViewModel @Inject constructor(private val repository: AlbumsReposito
     fun fetchAlbums(sorting: Sorting) {
         viewModelScope.launch {
             repository.getOriginalList()
+
                 .map {
                     val res = sort(sorting, AlbumResults( Mapper.toList(it), false, "Success", sorting!!))
                     sortingLiveData.postValue(res)
                     res
-                }.collect()
+                }
+                .catch { ex ->
+                    Timber.e(ex.localizedMessage)
+                }
+                .collect()
         }
 
     }
